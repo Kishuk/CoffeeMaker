@@ -43,7 +43,7 @@ public class CoffeeMachine implements CoffeeMachineI {
     }
 
     @Override
-    public void getDrink(int outlet, String drinkName) throws InvalidOutlet, InvalidDrinkException, InsufficientIngredientsException, InterruptedException, OutletBusyException {
+    public DrinkType getDrink(int outlet, String drinkName) throws InvalidOutlet, InvalidDrinkException, InsufficientIngredientsException, InterruptedException, OutletBusyException {
 
         if(outlet>this.totalOutlet) throw new InvalidOutlet();
 
@@ -51,7 +51,7 @@ public class CoffeeMachine implements CoffeeMachineI {
 
         try {
             DrinkType drink = this.drinkMakers[outlet - 1].getDrink(drinkName);
-            System.out.println(drink.toString() + " from outlet " + outlet);
+            return drink;
         } finally {
             this.releaseOutletLock(outlet);
         }

@@ -6,14 +6,27 @@ import com.kishuk.coffeeMaker.errors.InvalidIngredientException;
 import java.io.File;
 import java.io.IOException;
 
-public class test {
-    public static void main(String[] args) {
+public class Test {
+
+    CoffeeMakerClient client;
+
+    void Test1() {
         try {
-            CoffeeMakerClient.main(new String[]{new File("src/main/test").getAbsolutePath() +"/test.txt"});
+            client.process(new File("src/main/test").getAbsolutePath() +"/test.txt");
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } catch (InvalidIngredientException e) {
             System.out.printf("Ingredient required is not present %s", e.getMessage());
         }
+    }
+
+
+
+
+    public static void main(String[] args) {
+
+        Test test = new Test();
+        test.client = new CoffeeMakerClient();
+        test.Test1();
     }
 }

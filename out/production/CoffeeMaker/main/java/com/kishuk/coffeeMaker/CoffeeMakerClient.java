@@ -2,6 +2,7 @@ package com.kishuk.coffeeMaker;
 
 import com.kishuk.coffeeMaker.DrinkType.DrinkManager;
 import com.kishuk.coffeeMaker.DrinkType.DrinkRecipe;
+import com.kishuk.coffeeMaker.DrinkType.DrinkType;
 import com.kishuk.coffeeMaker.IngredinetType.Ingredient;
 import com.kishuk.coffeeMaker.IngredinetType.IngredientTypeManager;
 import com.kishuk.coffeeMaker.errors.InvalidIngredientException;
@@ -15,19 +16,19 @@ import java.util.concurrent.CountDownLatch;
 
 public class CoffeeMakerClient {
 
-    static BufferedReader reader;
-    static IngredientTypeManager im = new IngredientTypeManager();
-    static DrinkManager dm = new DrinkManager();
+    BufferedReader reader;
+    IngredientTypeManager im = new IngredientTypeManager();
+    DrinkManager dm = new DrinkManager();
 
-    static CoffeeMachineI machine;
+    CoffeeMachineI machine;
 
-    public static void readAllIngredients() throws IOException {
+    public void readAllIngredients() throws IOException {
 
         String[] is = reader.readLine().split(" ");
         for(String ingredient : is) im.addIngredientType(ingredient);
     }
 
-    public static void readAllDrinkConfig() throws IOException, InvalidIngredientException {
+    public void readAllDrinkConfig() throws IOException, InvalidIngredientException {
 
         Integer n = Integer.parseInt(reader.readLine());
         for(int i=0;i<n;i++) {
@@ -53,14 +54,14 @@ public class CoffeeMakerClient {
     }
 
 
-    public static void createMachine() throws IOException {
+    public void createMachine() throws IOException {
 
         int n = Integer.parseInt(reader.readLine());
         machine = new CoffeeMachine(n, im, dm);
 
     }
 
-    public static void fillStock() throws IOException, InvalidIngredientException {
+    public void fillStock() throws IOException, InvalidIngredientException {
 
         int n = Integer.parseInt(reader.readLine());
         for(int i=0;i<n;i++) {
@@ -73,7 +74,7 @@ public class CoffeeMakerClient {
 
     }
 
-    public static void processQuery(String q, CountDownLatch latch) {
+    public void processQuery(String q, CountDownLatch latch) {
         try {
             System.out.printf("request received for %s\n", q);
             String[] s =q.split(" ");
@@ -83,7 +84,8 @@ public class CoffeeMakerClient {
                     int onum = Integer.parseInt(s[2]);
                     String drinkName = s[1];
                     try {
-                        machine.getDrink(onum, drinkName);
+                        DrinkType drink  = machine.getDrink(onum, drinkName);
+                        System.out.println(drink.toString() + " from outlet " + onum);
                     } catch (Exception e) {
                         System.out.printf("get query not process got error: %s\n", e.getMessage());
                     }
@@ -107,7 +109,7 @@ public class CoffeeMakerClient {
     }
 
 
-    public static void processQueries() throws IOException, InterruptedException {
+    public void processQueries() throws IOException, InterruptedException {
         int n = Integer.parseInt(reader.readLine());
 
         System.out.println("\n\n\n\n\n ------------------Results---------------");
@@ -123,9 +125,13 @@ public class CoffeeMakerClient {
     }
 
     public static void main(String[] args) throws IOException, InvalidIngredientException, InterruptedException {
+        new CoffeeMakerClient().processSysIn(args);
+    }
 
 
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(args[0])));
+    public void processSysIn(String[] args) throws IOException, InvalidIngredientException, InterruptedException {
+
+        Reader reader = new BufferedReader(new InputStreamReader(new FileInputStream(args[0])));
 //        writer = new BufferedWriter(new OutputStreamWriter(System.out));
 
 
@@ -150,6 +156,24 @@ public class CoffeeMakerClient {
 
 
         reader.close();
-//        writer.close();
+    }
+
+
+    public void process(String fileName) throws IOException, InvalidIngredientException, InterruptedException {
+        setReader(fileName);
+
+        readAllIngredients();
+        readAllDrinkConfig();
+        createMachine();
+        fillStock();
+        processQueries();
+
+        reader.close();
+    }
+
+    private void setReader(String fileName) throws FileNotFoundException {
+        this.reader = new BufferedReader(new InputStreamReader(new FileInputStream(fileName)));
     }
 }
+
+
